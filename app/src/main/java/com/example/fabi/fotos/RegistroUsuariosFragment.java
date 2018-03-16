@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -50,7 +49,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.R.attr.path;
 
@@ -74,8 +72,6 @@ public class RegistroUsuariosFragment extends Fragment {
 
     File fileImagen;//Guarda la foto
     Bitmap bitmap;//Guarda la imagen transformada
-
-    Bitmap imgConvertida;
     Uri output;
     String fotoCodificada;
 
@@ -167,10 +163,6 @@ public class RegistroUsuariosFragment extends Fragment {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
             return true;
         }
-        if ((getContext().checkSelfPermission(INTERNET) == PackageManager.PERMISSION_GRANTED) &&
-                (getContext().checkSelfPermission(INTERNET)== PackageManager.PERMISSION_GRANTED)){
-            return true;
-        }
         if ((getContext().checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) &&
                 (getContext().checkSelfPermission(WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)){
             return true;
@@ -234,7 +226,7 @@ public class RegistroUsuariosFragment extends Fragment {
         dialogo.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,CAMERA,INTERNET},100);
+                requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,CAMERA},100);
 
             }
         });
@@ -277,8 +269,7 @@ public class RegistroUsuariosFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Matrix matrix;
-        Bitmap imagenRotada;
+
         switch (requestCode){
             case COD_SELECCIONADA:
                 Uri miPath = data.getData();
@@ -299,15 +290,7 @@ public class RegistroUsuariosFragment extends Fragment {
                 }
             });
                 bitmap = BitmapFactory.decodeFile(path);
-
-                //Rota la imagen
-                matrix = new Matrix();
-                matrix.postRotate(90);
-                imagenRotada = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
-
-
-                imgFoto.setImageBitmap(imagenRotada);
+                imgFoto.setImageBitmap(bitmap);
                 break;
         }
     }
@@ -431,9 +414,9 @@ public class RegistroUsuariosFragment extends Fragment {
                 String nombre = campoNombre.getText().toString();
                 String profesion = campoProfesion.getText().toString();
 
-
-
                 String imagen = ConvertirImagenString(bitmap);
+
+
 
                 /*Alimentamos el Map con los datos deseados*/
 
@@ -458,14 +441,6 @@ public class RegistroUsuariosFragment extends Fragment {
         bitmap.compress(Bitmap.CompressFormat.JPEG,100,array);
         byte []imagenByte= array.toByteArray();
         String imagenString = Base64.encodeToString(imagenByte,Base64.DEFAULT);
-
-        //Cuando la imagen está muy pesada
-        int alto = 150; //alto en pixeles
-        int ancho = 150; //ancho en pixeles
-
-        Bitmap foto = BitmapFactory.decodeByteArray(imagenByte, 0, imagenByte.length);
-        imgConvertida = Bitmap.createScaledBitmap(foto, ancho, alto, true);
-
         return imagenString;
     }
 
