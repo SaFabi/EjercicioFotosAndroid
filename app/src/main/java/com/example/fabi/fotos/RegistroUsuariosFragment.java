@@ -68,7 +68,7 @@ public class RegistroUsuariosFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     private static  final String CARPETA_PRINCIPAl = "misImagenesApp/";//Directorio Prinicipal
-    private static  final String CARPETA_IMAGEN = "imagenes";//Carpeta donde se guardan las fotos
+    private static  final String CARPETA_IMAGEN = "imagenesATC";//Carpeta donde se guardan las fotos
     private static  final String DIRECTORIO_IMAGEN = CARPETA_PRINCIPAl+ CARPETA_IMAGEN;//RUTA CARPETA DE DIRECTORIO
 
     File fileImagen;//Guarda la foto
@@ -292,7 +292,6 @@ public class RegistroUsuariosFragment extends Fragment {
                 }
             });
                 bitmap = BitmapFactory.decodeFile(path);
-
                 imgFoto.setImageBitmap(bitmap);
                 break;
         }
@@ -342,7 +341,11 @@ public class RegistroUsuariosFragment extends Fragment {
         progressDialog.hide();
         String url ="http://atc.mx/Android/test/ejercicioApp/wsJSONRegistroMovil.php?";
                /* Local
-               "http://192.168.1.116/ejemploBDRemota/wsJSONRegistroMovil.php?";*/
+                "http://192.168.1.116/ejemploBDRemota/wsJSONRegistroMovil.php?"
+
+                Externa
+               "http://atc.mx/Android/test/ejercicioApp/wsJSONRegistroMovil.php?";
+               */
 
         stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
