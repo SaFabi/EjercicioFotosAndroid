@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -269,7 +270,8 @@ public class RegistroUsuariosFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Matrix matrix;
+        Bitmap imagen;
         switch (requestCode){
             case COD_SELECCIONADA:
                 Uri miPath = data.getData();
@@ -290,9 +292,12 @@ public class RegistroUsuariosFragment extends Fragment {
                 }
             });
                 bitmap = BitmapFactory.decodeFile(path);
+
                 imgFoto.setImageBitmap(bitmap);
                 break;
         }
+
+        bitmap=RedimensionarImagen(bitmap,600,800);
     }
 
     public void onButtonPressed(Uri uri) {
@@ -301,23 +306,7 @@ public class RegistroUsuariosFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
 
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
@@ -351,7 +340,9 @@ public class RegistroUsuariosFragment extends Fragment {
 
     public void CargarWebService (){
         progressDialog.hide();
-        String url ="http://192.168.1.116/ejemploBDRemota/wsJSONRegistroMovil.php?";
+        String url ="http://atc.mx/Android/test/ejercicioApp/wsJSONRegistroMovil.php?";
+               /* Local
+               "http://192.168.1.116/ejemploBDRemota/wsJSONRegistroMovil.php?";*/
 
         stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
@@ -433,15 +424,38 @@ public class RegistroUsuariosFragment extends Fragment {
         };
 
         request.add(stringRequest);
+
+
     }
 
 
     public String ConvertirImagenString(Bitmap bitmap){
         ByteArrayOutputStream array = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,100,array);
+        bitmap.compress(Bitmap.CompressFormat.JPEG,50,array);
         byte []imagenByte= array.toByteArray();
         String imagenString = Base64.encodeToString(imagenByte,Base64.DEFAULT);
         return imagenString;
+    }
+
+    private Bitmap RedimensionarImagen(Bitmap bitmap, float anchoNuevo, float altoNuevo) {
+
+        int ancho=bitmap.getWidth();
+        int alto=bitmap.getHeight();
+
+        if(ancho>anchoNuevo || alto>altoNuevo){
+            float escalaAncho=anchoNuevo/ancho;
+            float escalaAlto= altoNuevo/alto;
+
+            Matrix matrix=new Matrix();
+            matrix.postScale(escalaAncho,escalaAlto);
+
+            return Bitmap.createBitmap(bitmap,0,0,ancho,alto,matrix,false);
+
+        }else{
+            return bitmap;
+        }
+
+
     }
 
 
